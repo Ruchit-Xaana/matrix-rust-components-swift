@@ -58,7 +58,7 @@ struct Release: AsyncParsableCommand {
         // Use the checked out commit hash and branch name
         let commitHash = try git.commitHash
 
-        Log.info("Building from commit \(currentCommitHash) on branch \(branch)")
+        Log.info("Building from commit \(commitHash) on branch \(branch)")
         
         // unset fixes an issue where swift compilation prevents building for targets other than macOS
         let cargoCommand = "cargo xtask swift build-framework --release --target aarch64-apple-ios --target aarch64-apple-ios-sim --target x86_64-apple-ios"
