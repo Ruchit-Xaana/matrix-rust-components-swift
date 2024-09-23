@@ -56,7 +56,7 @@ jobs:
         run: |
           cd package/Tools/Release
           swift build
-          swift run release --version "${{ github.event.inputs.version }}" --branch "${{ github.event.inputs.branch }}" --commit-hash "${{ github.event.inputs.commit_hash }}" --local-only
+          swift run release --version v1.0.44.1 --branch feature/patch_swift --local-only
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NETRC: ${{ secrets.NETRC }}
