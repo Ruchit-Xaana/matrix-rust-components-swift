@@ -21,7 +21,7 @@ struct Release: AsyncParsableCommand {
     }
     
     lazy var buildDirectory: URL = {
-    let buildDirPath = "\(FileManager.default.currentDirectoryPath)/../../source"
+    let buildDirPath = "/Users/runner/work/matrix-rust-components-swift/matrix-rust-components-swift/source"
     let fileManager = FileManager.default
     if !fileManager.fileExists(atPath: buildDirPath) {
         fatalError("The directory 'source' does not exist at path: \(buildDirPath)")
