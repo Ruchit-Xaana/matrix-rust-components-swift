@@ -55,7 +55,7 @@ jobs:
       - name: Run Release Script
         run: |
           cd package/Tools/Release
-          swift .Sources/Release.swift --version "${{ github.event.inputs.version }}" --branch "${{ github.event.inputs.branch }}" --commit-hash "${{ github.event.inputs.commit_hash }}" --local-only
+          swift ./Sources/Release.swift --version "${{ github.event.inputs.version }}" --branch "${{ github.event.inputs.branch }}" --commit-hash "${{ github.event.inputs.commit_hash }}" --local-only
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NETRC: ${{ secrets.NETRC }}
