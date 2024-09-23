@@ -13,9 +13,13 @@ struct Release: AsyncParsableCommand {
     @Flag(help: "Prevents the run from pushing anything to GitHub.")
     var localOnly = false
     
-    var apiToken = (try? NetrcParser.parse(file: FileManager.default.homeDirectoryForCurrentUser.appending(component: ".netrc")))!
-        .authorization(for: URL(string: "https://api.github.com")!)!
-        .password
+    let apiToken: String
+
+if let token = ProcessInfo.processInfo.environment["API_TOKEN_GITHUB"] {
+    apiToken = token
+} else {
+    fatalError("API Token not found. Please set the GITHUB_API_TOKEN environment variable.")
+}
     
     var sourceRepo = Repository(owner: "Ruchit-Xaana", name: "matrix-rust-sdk")
     var packageRepo = Repository(owner: "Ruchit-Xaana", name: "matrix-rust-components-swift")
