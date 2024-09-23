@@ -58,6 +58,6 @@ jobs:
           swift build
           swift run release --version v1.0.44.1 --branch feature/patch_swift --local-only
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
           NETRC: ${{ secrets.NETRC }}
 
