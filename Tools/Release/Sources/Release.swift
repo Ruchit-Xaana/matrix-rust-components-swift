@@ -9,9 +9,6 @@ struct Release: AsyncParsableCommand {
 
     @Option(help: "The branch of the source repository to build from.")
     var branch: String
-
-    @Option(help: "The commit hash of the source repository to build from.")
-    var commitHash: String
     
     @Flag(help: "Prevents the run from pushing anything to GitHub.")
     var localOnly = false
@@ -53,16 +50,13 @@ struct Release: AsyncParsableCommand {
             // Checkout the specified branch
             try git.checkout(branch: branch)
 
-            // Checkout the specified commit
-            try git.checkout(commitHash)
-
-            Log.info("Checked out branch \(branch) at commit \(commitHash)")
+            Log.info("Checked out branch \(branch)")
     }
     
     mutating func build() throws -> BuildProduct {
         let git = Git(directory: buildDirectory)
         // Use the checked out commit hash and branch name
-        let currentCommitHash = try git.commitHash
+        let commitHash = try git.commitHash
 
         Log.info("Building from commit \(currentCommitHash) on branch \(branch)")
         
