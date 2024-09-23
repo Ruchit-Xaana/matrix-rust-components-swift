@@ -54,7 +54,7 @@ jobs:
 
       - name: Run Release Script
         run: |
-          cd Tools/Release
+          cd package/Tools/Release
           swift build
           swift run release --version "${{ github.event.inputs.version }}" --branch "${{ github.event.inputs.branch }}" --commit-hash "${{ github.event.inputs.commit_hash }}" --local-only
         env:
