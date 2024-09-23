@@ -19,9 +19,15 @@ struct Release: AsyncParsableCommand {
     var packageDirectory: URL {
         return URL(fileURLWithPath: "\(FileManager.default.currentDirectoryPath)/package")
     }
+    
     lazy var buildDirectory: URL = {
-        return URL(fileURLWithPath: "\(FileManager.default.currentDirectoryPath)/source")
-    }()
+    let buildDirPath = "\(FileManager.default.currentDirectoryPath)/source"
+    let fileManager = FileManager.default
+    if !fileManager.fileExists(atPath: buildDirPath) {
+        fatalError("The directory 'source' does not exist at path: \(buildDirPath)")
+    }
+    return URL(fileURLWithPath: buildDirPath)
+}()
     
     mutating func run() async throws {
 
