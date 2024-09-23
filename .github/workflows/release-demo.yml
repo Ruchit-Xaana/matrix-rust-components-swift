@@ -48,7 +48,7 @@ jobs:
       - name: Set up Swift
         uses: swift-actions/setup-swift@v2
         with:
-          swift-version: '5.6'  # Adjust the version if necessary
+          swift-version: '5.9'  # Adjust the version if necessary
 
       - name: Run Release Script
         run: |
