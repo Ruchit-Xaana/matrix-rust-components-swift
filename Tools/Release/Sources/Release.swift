@@ -13,14 +13,6 @@ struct Release: AsyncParsableCommand {
     @Flag(help: "Prevents the run from pushing anything to GitHub.")
     var localOnly = false
     
-    let apiToken: String
-
-if let token = ProcessInfo.processInfo.environment["API_TOKEN_GITHUB"] {
-    apiToken = token
-} else {
-    fatalError("API Token not found. Please set the GITHUB_API_TOKEN environment variable.")
-}
-    
     var sourceRepo = Repository(owner: "Ruchit-Xaana", name: "matrix-rust-sdk")
     var packageRepo = Repository(owner: "Ruchit-Xaana", name: "matrix-rust-components-swift")
     
@@ -32,6 +24,13 @@ if let token = ProcessInfo.processInfo.environment["API_TOKEN_GITHUB"] {
     }()
     
     mutating func run() async throws {
+
+        guard let apiToken = ProcessInfo.processInfo.environment["API_TOKEN_GITHUB"] else {
+            fatalError("API Token not found. Please set the API_TOKEN_GITHUB environment variable.")
+        }
+        
+        // Use the apiToken safely here
+        print("API Token retrieved successfully.")
         // Checkout the specified branch and commit
         try checkoutBranchAndCommit()
 
