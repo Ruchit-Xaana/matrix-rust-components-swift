@@ -45,7 +45,7 @@ jobs:
           rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios aarch64-apple-darwin x86_64-apple-darwin
 
       - name: Set up Swift
-        uses: swiftwasm/setup-swift@v0.1.0
+        uses: swift-actions/setup-swift@v2
         with:
           swift-version: '5.6'  # Adjust the version if necessary
 
