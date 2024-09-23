@@ -25,7 +25,7 @@ struct Release: AsyncParsableCommand {
     }
     lazy var buildDirectory: URL = {
         return URL(fileURLWithPath: "\(FileManager.default.currentDirectoryPath)/source")
-    }
+    }()
     
     mutating func run() async throws {
         // Checkout the specified branch and commit
