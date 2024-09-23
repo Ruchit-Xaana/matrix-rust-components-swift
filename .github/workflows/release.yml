@@ -1,0 +1,56 @@
+name: release-demo.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version of the package to release'
+        required: true
+      branch:
+        description: 'Branch to build from'
+        required: true
+      commit_hash:
+        description: 'Commit hash to build'
+        required: true
+
+jobs:
+  release:
+    runs-on: macos-latest  # Use macOS runner
+
+    steps:
+      - name: Checkout Source Repository
+        uses: actions/checkout@v2
+        with:
+          repository: Ruchit-Xaana/matrix-rust-sdk
+          path: source
+
+      - name: Checkout Package Repository
+        uses: actions/checkout@v2
+        with:
+          repository: Ruchit-Xaana/matrix-rust-components-swift
+          path: package
+
+      - name: Install Xcode CLI Tools
+        run: |
+            sudo xcode-select --install || echo "Xcode CLI tools already installed"
+
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+          source $HOME/.cargo/env
+          rustup update
+          rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios aarch64-apple-darwin x86_64-apple-darwin
+
+      - name: Set up Swift
+        uses: swiftwasm/setup-swift@v0.1.0
+        with:
+          swift-version: '5.6'  # Adjust the version if necessary
+
+      - name: Run Release Script
+        run: |
+          cd package
+          swift run Release --version "${{ github.event.inputs.version }}" --branch "${{ github.event.inputs.branch }}" --commit-hash "${{ github.event.inputs.commit_hash }}" --local-only
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NETRC: ${{ secrets.NETRC }}
+

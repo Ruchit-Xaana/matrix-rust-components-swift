@@ -6,27 +6,40 @@ import Foundation
 struct Release: AsyncParsableCommand {
     @Option(help: "The version of the package that is being released.")
     var version: String
+
+    @Option(help: "The branch of the source repository to build from.")
+    var branch: String
     
     @Flag(help: "Prevents the run from pushing anything to GitHub.")
     var localOnly = false
     
-    var apiToken = (try? NetrcParser.parse(file: FileManager.default.homeDirectoryForCurrentUser.appending(component: ".netrc")))!
-        .authorization(for: URL(string: "https://api.github.com")!)!
-        .password
+    var sourceRepo = Repository(owner: "Ruchit-Xaana", name: "matrix-rust-sdk")
+    var packageRepo = Repository(owner: "Ruchit-Xaana", name: "matrix-rust-components-swift")
     
-    var sourceRepo = Repository(owner: "matrix-org", name: "matrix-rust-sdk")
-    var packageRepo = Repository(owner: "element-hq", name: "matrix-rust-components-swift")
+    var packageDirectory: URL {
+        return URL(fileURLWithPath: "\(FileManager.default.currentDirectoryPath)/package")
+    }
     
-    var packageDirectory = URL(fileURLWithPath: #file)
-        .deletingLastPathComponent() // Release.swift
-        .deletingLastPathComponent() // Sources
-        .deletingLastPathComponent() // Release
-        .deletingLastPathComponent() // Tools
-    lazy var buildDirectory = packageDirectory
-        .deletingLastPathComponent() // matrix-rust-components-swift
-        .appending(component: "matrix-rust-sdk")
+    lazy var buildDirectory: URL = {
+    let buildDirPath = "/Users/runner/work/matrix-rust-components-swift/matrix-rust-components-swift/source"
+    let fileManager = FileManager.default
+    if !fileManager.fileExists(atPath: buildDirPath) {
+        fatalError("The directory 'source' does not exist at path: \(buildDirPath)")
+    }
+    return URL(fileURLWithPath: buildDirPath)
+}()
     
     mutating func run() async throws {
+
+        guard let apiToken = ProcessInfo.processInfo.environment["API_TOKEN_GITHUB"] else {
+            fatalError("API Token not found. Please set the API_TOKEN_GITHUB environment variable.")
+        }
+        
+        // Use the apiToken safely here
+        print("API Token retrieved successfully.")
+        // Checkout the specified branch and commit
+        try checkoutBranchAndCommit()
+
         let package = Package(repository: packageRepo, directory: packageDirectory, apiToken: apiToken, urlSession: localOnly ? .releaseMock : .shared)
         Zsh.defaultDirectory = package.directory
         
@@ -39,13 +52,22 @@ struct Release: AsyncParsableCommand {
         try commitAndPush(package, with: product)
         try await package.makeRelease(with: product, uploading: zipFileURL)
     }
+
+    mutating func checkoutBranchAndCommit() throws {
+            let git = Git(directory: buildDirectory)
+
+            // Checkout the specified branch
+            try git.checkout(branch: branch)
+
+            Log.info("Checked out branch \(branch)")
+    }
     
     mutating func build() throws -> BuildProduct {
         let git = Git(directory: buildDirectory)
+        // Use the checked out commit hash and branch name
         let commitHash = try git.commitHash
-        let branch = try git.branchName
-        
-        Log.info("Building \(branch) at \(commitHash)")
+
+        Log.info("Building from commit \(commitHash) on branch \(branch)")
         
         // unset fixes an issue where swift compilation prevents building for targets other than macOS
         let cargoCommand = "cargo xtask swift build-framework --release --target aarch64-apple-ios --target aarch64-apple-ios-sim --target x86_64-apple-ios"
